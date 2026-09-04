@@ -1,41 +1,40 @@
-# Certificates for an improved lower bound for the complex Grothendieck constant - DRAFT
+# Certificates for a lower bound on the complex Grothendieck constant - DRAFT
 
-**DRAFT RELEASE - NOT FOR SUBMISSION.** The arXiv URL below is a placeholder. Replace it with the exact versioned arXiv URL and rebuild this archive before submission.
+**DRAFT RELEASE - NOT FOR SUBMISSION.** The arXiv link below is a placeholder.
 
-**CERTIFICATE REPLAY PENDING.** This prepared repository does not yet contain the two frozen result files or `SHA256SUMS`. The primary verification command is expected to fail until the external replay and finalization complete.
+**CERTIFICATE REPLAY PENDING.** The two result files and `SHA256SUMS` will be
+added after the external replay. Verification is expected to fail until then.
 
-This repository contains the directed certificates for the two
-computer-assisted propositions in *An Improved Lower Bound for the Complex
-Grothendieck Constant*:
+This repository accompanies *An Improved Lower Bound for the Complex
+Grothendieck Constant*. It contains the files for two computer-assisted
+statements:
 
-> **LB-CERT:** `K_G^C > 1.35584631827168`.
+- **LB-CERT:** `K_G^C > 1.35584631827168`.
+- **DUAL-CERT:** `K_* < 1.35584697425050`, where `K_*` is the restricted
+  optimization value in Theorem 5.2.
 
-> **DUAL-CERT:** `K_* < 1.35584697425050`, where `K_*` is the restricted
-> parameter-optimization value defined in Theorem 5.2 of the paper.
+The analytic arguments are in the paper. The programs here check the numerical
+parts of Propositions 4.1 and 5.5.
 
-The temporary manuscript reference is <https://arxiv.org/abs/XXXX.XXXXXv1>.
+Manuscript: <https://arxiv.org/abs/XXXX.XXXXXv1>
+
 No manuscript source or PDF is included in this certificate.
-
-The paper proves the analytic reductions. This repository verifies the exact
-finite inputs and all directed numerical inequalities used by Propositions 4.1
-and 5.5. It does not prove the analytic reductions, an exact value of
-`K_G^C`, or an unrestricted upper bound.
 
 ## Verification
 
-Frozen-certificate verification uses only Python 3.10 or newer and the standard
-library. From the repository root, run
+Once the frozen result files are present, Python 3.10 or newer is sufficient;
+no external package is needed. Run
 
 ```sh
 python3 verification/verify.py
 ```
 
-A successful run prints a line beginning `VERIFIED:` and exits with status
-`0`. It verifies both certificate result files, their exact inputs and source
-hashes, the claim--artifact map, the complete repository inventory, and the
-accepted external-replay record. It does not rerun Arb.
+from the repository root. A successful run prints a line beginning `VERIFIED:`
+and exits with status `0`. This checks the two result files, their inputs and
+source hashes, the recorded external replay, and the repository inventory. It
+does not rerun Arb.
 
-For the optional integrity-only check, run
+To check only the file hashes, run
 
 ```sh
 python3 verification/verify_checksums.py
@@ -43,75 +42,61 @@ python3 verification/verify_checksums.py
 
 ## Files
 
-```text
-.
-├── artifacts/
-│   ├── lb/result.json                    # frozen LB-CERT result
-│   ├── dual/result.json                  # frozen DUAL-CERT result
-│   └── external-run-environment.json     # accepted external replay
-├── computations/
-│   ├── weighted_chaos_safe_candidate.json
-│   ├── certify_weighted_chaos_candidate_arb.py
-│   ├── certify_ten_chaos_arb.py
-│   ├── weighted_chaos_dual_mixture_candidate.json
-│   └── certify_weighted_chaos_dual_mixture_arb.py
-├── claims/release-spec.json              # exact thresholds and source hashes
-├── verification/
-│   ├── verify.py                         # primary command-line entry point
-│   ├── verify_results.py                 # frozen certificate checker
-│   ├── verify_checksums.py               # optional integrity checker
-│   ├── audit_code.py                     # independent formula-level audit
-│   ├── code-audit.json
-│   ├── frozen-result-check.json
-│   ├── path-portability.json
-│   └── verification-report.json
-├── repository-manifest.json              # claim and artifact metadata
-└── SHA256SUMS                            # complete file-hash inventory
-```
+- `artifacts/lb/result.json` is the frozen LB-CERT result.
+- `artifacts/dual/result.json` is the frozen DUAL-CERT result.
+- `computations/` contains the exact inputs and Arb programs.
+- `verification/verify.py` is the main verification command.
+- `verification/verify_results.py` checks the mathematical result files.
+- `verification/audit_code.py` checks the formulas used by the Arb programs.
+- `verification/verification-report.json` records the accepted replay.
+- `repository-manifest.json` identifies the claims and their files.
+- `SHA256SUMS` covers the complete repository snapshot.
 
-The verification flow is
+## LB-CERT
+
+The exact multiplier and radial-weight parameters are in
+`computations/weighted_chaos_safe_candidate.json`. LB-CERT checks 132 residual
+blocks through 570 interval `LDL^*` pivots, proves the Schur condition `S < 1`,
+and checks the final ratio.
+
+In the result file, `xi` is the paper's scalar `S`, and `woodbury_margin` is
+`1-S`. Together with the analytic argument in the paper, the certificate gives
 
 ```text
-verification/verify.py
-        |
-        v
-verification/verify_results.py
-        |--------------------------|
-        v                          v
-artifacts/lb/result.json    artifacts/dual/result.json
-        |                          |
-        v                          v
-exact LB inputs             exact 180-atom input
+K_G^C > 1.35584631827168.
 ```
 
-## How the certificates enter the paper
+## DUAL-CERT
 
-The two artifacts have different logical roles:
+The exact 180-atom input is in
+`computations/weighted_chaos_dual_mixture_candidate.json`. DUAL-CERT checks its
+normalization, a gap-free 98-interval cover of `[0, 100000]`, the validated
+quadrature and Taylor bounds, and the analytic tail. Together with the dual
+argument in the paper, it gives
 
-1. **LB-CERT** checks all finite hypotheses of Proposition 4.1: 132 residual
-   block complements through 570 interval `LDL^*` pivots, the Schur condition
-   `S < 1`, the radial-weight mean, and the strict final ratio. The paper's
-   analytic results then imply `K_G^C > 1.35584631827168`.
-2. **DUAL-CERT** checks the exact normalization of 180 positive atoms, a
-   gap-free 98-interval cover of `[0, 100000]`, validated quadrature and
-   Taylor--Bernstein bounds, and the analytic tail. The paper's dual lemma then
-   implies only `K_* < 1.35584697425050`.
+```text
+K_* < 1.35584697425050.
+```
 
-In LB-CERT, the result field `xi` is the paper's Schur scalar `S`, and
-`woodbury_margin` is `1-S`. DUAL-CERT is not an upper bound for the
-unrestricted complex Grothendieck constant.
+This is a bound for the restricted optimization problem in Theorem 5.2, not an
+upper bound for the complex Grothendieck constant.
 
-## Full recomputation
+## Recomputing the certificates
 
-Full recomputation requires Python 3.11 and `python-flint==0.8.0`; the accepted
-replay used Python 3.11.9 on Windows. Install the pinned dependency with
+Full recomputation requires Python 3.11 and `python-flint==0.8.0`. Install the
+pinned version with
 
 ```sh
 python3 -m pip install -r environment/requirements.txt
 ```
 
-Then use a disposable copy of the repository because these commands replace
-the frozen result files. Run LB-CERT with
+Run the formula checks:
+
+```sh
+python3 verification/audit_code.py --root . --report verification/code-audit.json
+```
+
+Run LB-CERT:
 
 ```sh
 python3 computations/certify_weighted_chaos_candidate_arb.py \
@@ -123,7 +108,7 @@ python3 computations/certify_weighted_chaos_candidate_arb.py \
   --output artifacts/lb/result.json
 ```
 
-Run DUAL-CERT from the repository root:
+Run DUAL-CERT:
 
 ```sh
 python3 computations/certify_weighted_chaos_dual_mixture_arb.py \
@@ -138,62 +123,32 @@ python3 computations/certify_weighted_chaos_dual_mixture_arb.py \
   --output artifacts/dual/result.json
 ```
 
-Run the independent formula-level audit with
-
-```sh
-python3 verification/audit_code.py --root . --report verification/code-audit.json
-```
-
-The accepted replay used one CPU worker. LB-CERT completed in seconds and
-DUAL-CERT in about eleven minutes on the recorded machine. After recomputation,
-check the newly produced mathematical results with
+These commands overwrite the result paths, so use a disposable copy. Check the
+new results with
 
 ```sh
 python3 verification/verify_results.py --root . --only all
 ```
 
-The primary `verification/verify.py` command is intentionally stricter: it
-audits the frozen repository inventory and accepted external-result hashes, so
-it should be run on an unchanged repository snapshot.
+The accepted replay used Python 3.11.9 with python-flint 0.8.0 on Windows.
 
-## What the checker verifies
+## Provenance
 
-The frozen-result checker verifies:
+This draft was prepared from commit
+`9a1c6263c69787343f27a623f0496dd2c9c91d42`. The exact source hashes are in
+`claims/release-spec.json`. Finalization keeps the result JSON files unchanged
+and records their hashes in `verification/path-portability.json`.
 
-1. the release schema, exact thresholds, source digests, and claim--artifact
-   links;
-2. every LB-CERT residual block and pivot, the Schur enclosure, the weight
-   integral, and the strict lower-bound ratio;
-3. the exact DUAL-CERT atom normalization, all 98 adjacent cover intervals,
-   their strict margins, and the global tail;
-4. the accepted Python/python-flint environment and byte-identical external
-   and bundled result hashes;
-5. the exact repository inventory, path portability, and `SHA256SUMS` entries.
-
-The checker verifies the finished certificates. It does not rerun the
-floating-point searches that found either candidate.
-
-## Release status and provenance
-
-The computation sources were staged from Git commit `1919a63486143f26be51a992071d3d8298571022`. Every material
-input and verifier is independently identified by SHA-256 in
-`claims/release-spec.json`. The producers emit repository-relative provenance
-paths, and finalization never edits a result JSON.
-
-The lower-level release gate is
+A final release must use the versioned arXiv URL and pass
 
 ```sh
 python3 verification/verify_results.py \
   --root . --only all --audit-bundle --require-final
 ```
 
-It deliberately exits nonzero for a draft repository. The primary
-`verification/verify.py` command still verifies the mathematical certificate
-content of a correctly marked draft and reports its release status explicitly.
-Process logs, status streams, orchestration scripts, caches, and manuscript
-files are excluded from the repository.
+The numerical searches used to find the two candidates are not part of the
+certificate.
 
-## License and redistribution
+## License
 
-See `LICENSE-NOTICE.md`. No redistribution license beyond applicable law is
-asserted by this release.
+See `LICENSE-NOTICE.md`.

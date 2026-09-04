@@ -174,7 +174,7 @@
       "statement": "K_* < 1.35584697425050"
     }
   ],
-  "computation_source_commit": "1919a63486143f26be51a992071d3d8298571022",
+  "computation_source_commit": "9a1c6263c69787343f27a623f0496dd2c9c91d42",
   "environment": {
     "description": "Frozen certificate verification uses Python 3.10 or newer and only the standard library. Full Arb recomputation uses Python 3.11 with the pinned python-flint requirement.",
     "files": [
