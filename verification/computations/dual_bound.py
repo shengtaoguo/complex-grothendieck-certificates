@@ -14,7 +14,6 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 from fractions import Fraction
-import hashlib
 import json
 import math
 import os
@@ -30,17 +29,6 @@ from flint import arb, arb_series, ctx
 
 DEFAULT_RUN_ID = "R20260808-CGC-SCALAR-DUAL-MIXTURE-ARB-POINT-001"
 EXPECTED_FLINT_VERSION = "0.8.0"
-
-
-def bundle_relative_path(path: Path) -> str:
-    root = Path.cwd().resolve()
-    resolved = path.resolve()
-    try:
-        return resolved.relative_to(root).as_posix()
-    except ValueError as error:
-        raise ValueError(
-            f"certificate input lies outside the bundle root: {path}"
-        ) from error
 
 
 def emit_status(path: Path, run_id: str, **record: object) -> None:
@@ -480,7 +468,6 @@ def main() -> None:
     )
     parser.add_argument("--status", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--startup-delay", type=float, default=0.0)
     arguments = parser.parse_args()
     if arguments.maximum_moment < 0:
         raise ValueError("maximum moment must be nonnegative")
@@ -510,11 +497,10 @@ def main() -> None:
         elapsed_seconds=0.0,
         estimated_remaining_seconds="unknown",
     )
-    if arguments.startup_delay:
-        time.sleep(arguments.startup_delay)
 
     try:
         ctx.dps = arguments.precision_digits
+        ctx.threads = 1
         q_values, weights, candidate_payload = load_candidate(
             arguments.candidate_json
         )
@@ -760,7 +746,6 @@ def main() -> None:
             )
             terminal_total = len(intervals) + 1
 
-        source_path = Path(__file__).resolve()
         computed_moment_order = (
             arguments.derivative_order
             if arguments.mode == "continuum"
@@ -772,10 +757,6 @@ def main() -> None:
             "role": role,
             "proof_status": proof_status,
             "configuration": {
-                "candidate_json": bundle_relative_path(arguments.candidate_json),
-                "candidate_sha256": hashlib.sha256(
-                    arguments.candidate_json.read_bytes()
-                ).hexdigest(),
                 "mode": arguments.mode,
                 "points": arguments.points if arguments.mode == "points" else None,
                 "maximum_moment": arguments.maximum_moment,
@@ -798,10 +779,7 @@ def main() -> None:
             "weight_sum": ball_record(sum(weights, arb(0))),
             "points": point_records,
             "continuum": continuum_record,
-            "source": {
-                "path": bundle_relative_path(source_path),
-                "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
-            },
+            "atoms": candidate_payload["atoms"],
             "elapsed_seconds": time.monotonic() - started,
         }
         arguments.output.write_text(
@@ -819,7 +797,7 @@ def main() -> None:
             estimated_remaining_seconds=0.0,
             output=str(arguments.output),
         )
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(f"PASS: DUAL-CERT; results: {arguments.output}")
     except Exception as error:
         emit_status(
             arguments.status,

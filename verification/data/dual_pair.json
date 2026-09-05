@@ -1,10 +1,4 @@
 {
-  "seed_run_id": "R20260808-CGC-SCALAR-DUAL-MIXTURE-002",
-  "seed_result_sha256": "61f8fe46d0b81af59b4656fabb78962c7e52032b12b3a337ebf9ec8be80a8561",
-  "proof_status": "exact candidate input used by DUAL-CERT; certification status is determined by the paired result artifact",
-  "target_squared_ceiling": "1.35584697425050",
-  "buffered_squared_ceiling": "1.355847",
-  "normalization": "all q and weight fields are exact terminating decimals; weights sum exactly to one",
   "atoms": [
     {
       "q": "0.0009990009990009992",

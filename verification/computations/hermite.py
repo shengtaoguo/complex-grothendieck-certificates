@@ -5,7 +5,7 @@ Every displayed decimal parameter is converted to an exact rational before
 being embedded in an Arb ball.  The verifier certifies all residual
 complements by interval LDL decomposition, certifies the main Woodbury
 condition, and proves the installed lower-ratio threshold.  This module has no
-standalone candidate; use certify_weighted_chaos_candidate_arb.py.
+standalone candidate; use lower_bound.py.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ def installed_candidate() -> tuple[str, str, str, list[str], dict[str, str]]:
     ):
         raise RuntimeError(
             "no LB candidate is installed; run "
-            "certify_weighted_chaos_candidate_arb.py with an exact candidate JSON"
+            "lower_bound.py with an exact candidate JSON"
         )
     if getattr(flint, "__version__", None) != EXPECTED_FLINT_VERSION:
         raise RuntimeError(
@@ -292,6 +292,7 @@ def certify(
         installed_candidate()
     )
     ctx.dps = precision_digits
+    ctx.threads = 1
     rho = exact_decimal(rho_text)
     beta = [exact_decimal(value) for value in beta_texts]
     parameters = {
@@ -512,7 +513,7 @@ def certify(
 def main() -> None:
     raise SystemExit(
         "This is an internal library. Run "
-        "certify_weighted_chaos_candidate_arb.py with an exact candidate JSON."
+        "lower_bound.py with an exact candidate JSON."
     )
 
 

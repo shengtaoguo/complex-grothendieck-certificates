@@ -1,2 +1,1 @@
-# Preserve the byte-exact files covered by SHA256SUMS.
-* -text
+* text=auto eol=lf

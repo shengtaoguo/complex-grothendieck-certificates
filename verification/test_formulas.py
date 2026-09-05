@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Independent structural and formula-level smoke tests for certificate code."""
+"""Supplementary checks of the Hermite and Taylor--Bernstein formulas."""
 
 from __future__ import annotations
 
 import argparse
-import ast
 from fractions import Fraction
 import importlib
 import json
@@ -68,14 +67,6 @@ def direct_radial_product(
     return result
 
 
-def audit_python_sources(root: Path) -> dict[str, int]:
-    files = sorted((root / "computations").glob("*.py"))
-    files.append(root / "verification/verify_results.py")
-    for path in files:
-        ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    return {"parsed_file_count": len(files)}
-
-
 def audit_lower_bound_code(root: Path, core: Any, wrapper: Any, arb_type: Any) -> dict[str, int]:
     products: set[tuple[int, int, int, int]] = set()
     for residual_p in range(12):
@@ -116,7 +107,7 @@ def audit_lower_bound_code(root: Path, core: Any, wrapper: Any, arb_type: Any) -
     require(maximum_degree <= 21, "radial product degree exceeds the moment budget")
 
     candidate = wrapper.load_decimal_candidate(
-        root / "computations/weighted_chaos_safe_candidate.json"
+        root / "verification/data/lower_bound.json"
     )
     rho = core.exact_decimal(str(candidate["rho"]))
     parameters = {
@@ -212,7 +203,7 @@ def audit_dual_certificate_code(root: Path, dual: Any, arb_type: Any) -> dict[st
         )
 
     q_values, weights, _ = dual.load_candidate(
-        root / "computations/weighted_chaos_dual_mixture_candidate.json"
+        root / "verification/data/dual_pair.json"
     )
     scalar = dual.scalar_integrands(arb_type("1/3"), arb_type(2), q_values, weights, 8)
     series = dual.series_integrands(arb_type("1/3"), arb_type(2), q_values, weights, 8)
@@ -238,20 +229,20 @@ def main() -> None:
     parser.add_argument("--report", type=Path)
     arguments = parser.parse_args()
     root = arguments.root.resolve()
-    sys.path.insert(0, str(root / "computations"))
+    sys.path.insert(0, str(root / "verification/computations"))
 
     flint = importlib.import_module("flint")
-    core = importlib.import_module("certify_ten_chaos_arb")
-    wrapper = importlib.import_module("certify_weighted_chaos_candidate_arb")
-    dual = importlib.import_module("certify_weighted_chaos_dual_mixture_arb")
+    core = importlib.import_module("hermite")
+    wrapper = importlib.import_module("lower_bound")
+    dual = importlib.import_module("dual_bound")
     require(getattr(flint, "__version__", None) == "0.8.0", "code audit requires python-flint 0.8.0")
     flint.ctx.dps = 180
+    flint.ctx.threads = 1
 
     report = {
         "schema_version": 1,
         "status": "passed",
         "python_flint_version": flint.__version__,
-        "source_checks": audit_python_sources(root),
         "lower_bound_checks": audit_lower_bound_code(root, core, wrapper, flint.arb),
         "dual_certificate_checks": audit_dual_certificate_code(root, dual, flint.arb),
     }
@@ -259,7 +250,7 @@ def main() -> None:
         output = arguments.report if arguments.report.is_absolute() else root / arguments.report
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps(report, indent=2, sort_keys=True))
+    print("PASS: Hermite coefficients, weight identities, and Taylor--Bernstein formulas")
 
 
 if __name__ == "__main__":

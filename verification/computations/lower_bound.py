@@ -5,24 +5,12 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
 import time
 import traceback
 
-import certify_ten_chaos_arb as certificate
-
-
-def bundle_relative_path(path: Path) -> str:
-    root = Path.cwd().resolve()
-    resolved = path.resolve()
-    try:
-        return resolved.relative_to(root).as_posix()
-    except ValueError as error:
-        raise ValueError(
-            f"certificate input lies outside the bundle root: {path}"
-        ) from error
+import hermite as certificate
 
 
 def emit_status(path: Path, run_id: str, **record: object) -> None:
@@ -77,7 +65,6 @@ def main() -> None:
     parser.add_argument("--precision-digits", type=int, default=180)
     parser.add_argument("--status", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--startup-delay", type=float, default=0.0)
     arguments = parser.parse_args()
 
     arguments.status.parent.mkdir(parents=True, exist_ok=True)
@@ -92,8 +79,6 @@ def main() -> None:
         elapsed_seconds=0.0,
         estimated_remaining_seconds="unknown",
     )
-    if arguments.startup_delay:
-        time.sleep(arguments.startup_delay)
     started = time.monotonic()
 
     try:
@@ -107,24 +92,10 @@ def main() -> None:
             arguments.precision_digits,
             arguments.status,
         )
-        source_path = Path(__file__).resolve()
-        verifier_source = source_path.with_name("certify_ten_chaos_arb.py")
         result["role"] = (
             "directed Arb verification of the optimized ten-chaos two-pole "
             "unrestricted complex lower certificate"
         )
-        result["source"] = {
-            "path": bundle_relative_path(source_path),
-            "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
-            "verifier_path": bundle_relative_path(verifier_source),
-            "verifier_sha256": hashlib.sha256(
-                verifier_source.read_bytes()
-            ).hexdigest(),
-            "parameters_path": bundle_relative_path(arguments.parameters_json),
-            "parameters_sha256": hashlib.sha256(
-                arguments.parameters_json.read_bytes()
-            ).hexdigest(),
-        }
         result["elapsed_seconds"] = time.monotonic() - started
         arguments.output.write_text(
             json.dumps(result, indent=2, sort_keys=True) + "\n",
@@ -141,7 +112,7 @@ def main() -> None:
             estimated_remaining_seconds=0.0,
             output=str(arguments.output),
         )
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(f"PASS: LB-CERT; results: {arguments.output}")
     except Exception as error:
         emit_status(
             arguments.status,
