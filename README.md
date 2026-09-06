@@ -7,7 +7,7 @@ Bound for the Complex Grothendieck Constant*. They verify two results:
   $K_G^{\mathbb C}>1.35584631827168$.
 - **DUAL-CERT:** the uniform inequality giving
   $\mathcal K_*<1.35584697425050$ for the paper's restricted optimization
-  problem. This is **not** an upper bound for $K_G^{\mathbb C}$.
+  problem. This is **not** an upper bound for the complex Grothendieck constant.
 
 ## Run
 
