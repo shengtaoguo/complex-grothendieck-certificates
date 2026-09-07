@@ -1,11 +1,11 @@
-# Complex Grothendieck Certificates
+# Complex Grothendieck Computations
 
 This repository contains the computations accompanying *An Improved Lower
 Bound for the Complex Grothendieck Constant*. They verify two results:
 
-- **LB-CERT:** the matrix and Schur inequalities giving
+- **Lower-bound computation:** the matrix and Schur inequalities giving
   $K_G^{\mathbb C}>1.35584631827168$.
-- **DUAL-CERT:** the uniform inequality giving
+- **Pointwise-bound computation:** the uniform inequality giving
   $\mathcal K_*<1.35584697425050$ for the paper's restricted optimization
   problem. This is **not** an upper bound for the complex Grothendieck constant.
 
@@ -18,17 +18,18 @@ python3 -m pip install -r verification/requirements.txt
 python3 verification/verify.py
 ```
 
-The command recomputes both certificates using Arb interval arithmetic,
+The command runs both computations using Arb interval arithmetic,
 checks the paper's strict bounds, and tests that malformed or inconsistent
 results are rejected. Success prints `VERIFIED:`; failures exit with a
 nonzero status. Results and progress logs are written to a new directory
 under `replay-results/`.
 
-The certificates are computed one at a time, with one numerical thread,
+The computations run one at a time, with one numerical thread,
 using `python-flint==0.8.0`. The full Windows test run took about 27 minutes;
-LB-CERT alone takes seconds. No TeX, optimizer, or saved search results are needed.
+the lower-bound computation alone takes seconds. No TeX, optimizer, or
+saved search results are needed.
 
-To recompute just one certificate, use `--only lb` or `--only dual`.
+To run just one computation, use `--only lb` or `--only dual`.
 
 ## Files
 
@@ -40,9 +41,9 @@ verification/
 ├── test_checks.py            # rejection of damaged results
 ├── test_formulas.py          # supplementary formula checks
 ├── computations/
-│   ├── lower_bound.py        # LB-CERT
+│   ├── lower_bound.py        # lower-bound computation
 │   ├── hermite.py            # Hermite integrals, matrices, and LDL decomposition
-│   └── dual_bound.py         # DUAL-CERT
+│   └── dual_bound.py         # pointwise-bound computation
 └── data/
     ├── lower_bound.json      # exact multiplier and weight parameters
     └── dual_pair.json        # exact 180-pair dual input
@@ -52,13 +53,14 @@ verification/
 
 | Paper result | Computation | What is checked |
 | --- | --- | --- |
-| Proposition 4.1; Appendix A.1 | [LB-CERT](verification/computations/lower_bound.py), [Hermite calculations](verification/computations/hermite.py) | All 132 residual blocks and 570 positive pivots, the Schur condition, and the lower-bound ratio. |
-| Proposition 5.5; Appendix A.2 | [DUAL-CERT](verification/computations/dual_bound.py) | Exact normalization of the 180 pairs, a gap-free cover of $[0,10^5]$, and the analytic tail bound. |
+| Proposition 4.1; Appendix A.1 | [Lower-bound computation](verification/computations/lower_bound.py), [Hermite calculations](verification/computations/hermite.py) | All 132 residual blocks and 570 positive pivots, the Schur condition, and the lower-bound ratio. |
+| Proposition 5.5; Appendix A.2 | [Pointwise-bound computation](verification/computations/dual_bound.py) | Exact normalization of the 180 pairs, a gap-free cover of $[0,10^5]$, and the analytic tail bound. |
 | Both computations | [Formula checks](verification/test_formulas.py) | Radial Hermite coefficients, rational-weight identities, quadrature panels, and Taylor--Bernstein formulas. |
 
 Input decimals are treated as exact rational numbers. Arb then encloses the
 integrals and matrix calculations with rigorous error bounds, using
-180-digit precision for LB-CERT and 80-digit precision for DUAL-CERT.
+180-digit precision for the lower-bound computation and 80-digit precision
+for the pointwise-bound computation.
 
 The operator reduction and coefficient-matching argument are proved in the
 paper. These scripts verify their numerical hypotheses; they do not prove
