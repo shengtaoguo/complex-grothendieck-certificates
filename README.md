@@ -1,4 +1,4 @@
-# Complex Grothendieck Computations
+# Complex Grothendieck Certificates
 
 This repository contains the computations accompanying *An Improved Lower
 Bound for the Complex Grothendieck Constant*. They verify two results:
