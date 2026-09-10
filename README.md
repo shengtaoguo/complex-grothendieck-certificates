@@ -1,7 +1,8 @@
 # Complex Grothendieck Certificates
 
-This repository contains the computations accompanying *An Improved Lower
-Bound for the Complex Grothendieck Constant*. They verify two results:
+This repository contains the computations accompanying
+*[An Improved Lower Bound for the Complex Grothendieck Constant](https://arxiv.org/abs/2609.07000)*.
+They verify two results:
 
 - **Lower-bound computation:** the matrix and Schur inequalities giving
   $K_G^{\mathbb C}>1.35584631827168$.
